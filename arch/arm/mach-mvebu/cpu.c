@@ -55,6 +55,11 @@ int mvebu_soc_family(void)
 	case SOC_MV78460_ID:
 		return MVEBU_SOC_AXP;
 
+	case SOC_88F6707_ID:
+	case SOC_88F6710_ID:
+	case SOC_88F6W11_ID:
+		return MVEBU_SOC_A370;
+
 	case SOC_88F6720_ID:
 		return MVEBU_SOC_A375;
 
@@ -69,7 +74,17 @@ int mvebu_soc_family(void)
 
 #if defined(CONFIG_DISPLAY_CPUINFO)
 
-#if defined(CONFIG_ARMADA_375)
+#if defined(CONFIG_ARMADA_370)
+/* SAR frequency values for Armada 370 */
+static const struct sar_freq_modes sar_freq_tab[] = {
+	{  0x1, 0x13,  533, 533, 533 },
+	{  0x2,  0x1,  667, 333, 333 },
+	{  0x3, 0x14,  800, 533, 533 },
+	{  0x4, 0x14, 1000, 667, 667 },
+	{  0x6,  0x5, 1200, 600, 600 },
+	{ 0xff, 0xff,    0,   0,   0 }	/* 0xff marks end of array */
+};
+#elif defined(CONFIG_ARMADA_375)
 /* SAR frequency values for Armada 375 */
 static const struct sar_freq_modes sar_freq_tab[] = {
 	{  0,  0x0,  266,  133,  266 },
@@ -175,7 +190,7 @@ void get_sar_freq(struct sar_freq_modes *sar_freq)
 	}
 
 	/* SAR value not found, return 0 for frequencies */
-	*sar_freq = sar_freq_tab[i - 1];
+	*sar_freq = sar_freq_tab[i];
 }
 
 int print_cpuinfo(void)
@@ -195,6 +210,15 @@ int print_cpuinfo(void)
 		break;
 	case SOC_MV78460_ID:
 		puts("MV78460-");
+		break;
+	case SOC_88F6707_ID:
+		puts("MV88F6707-");
+		break;
+	case SOC_88F6710_ID:
+		puts("MV88F6710-");
+		break;
+	case SOC_88F6W11_ID:
+		puts("MV88F6W11-");
 		break;
 	case SOC_88F6720_ID:
 		puts("MV88F6720-");
@@ -220,6 +244,20 @@ int print_cpuinfo(void)
 			break;
 		case 2:
 			puts("B0");
+			break;
+		default:
+			printf("?? (%x)", revid);
+			break;
+		}
+	}
+
+	if (mvebu_soc_family() == MVEBU_SOC_A370) {
+		switch (revid) {
+		case MV_88F6710_A0_ID:
+			puts("A0");
+			break;
+		case MV_88F6710_A1_ID:
+			puts("A1");
 			break;
 		default:
 			printf("?? (%x)", revid);
@@ -435,13 +473,23 @@ int arch_cpu_init(void)
 		clrsetbits_le32(ARMADA_XP_PUP_ENABLE, 0,
 				GE0_PUP_EN | GE1_PUP_EN | LCD_PUP_EN |
 				NAND_PUP_EN | SPI_PUP_EN);
+	}
 
+	if (mvebu_soc_family() == MVEBU_SOC_AXP ||
+	    mvebu_soc_family() == MVEBU_SOC_A370) {
 		/* Configure USB PLL and PHYs on AXP */
 		setup_usb_phys();
 	}
 
 	/* Enable NAND and NAND arbiter */
 	clrsetbits_le32(MVEBU_SOC_DEV_MUX_REG, 0, NAND_EN | NAND_ARBITER_EN);
+
+#ifdef CONFIG_SYS_MVEBU_NAND_CLOCK
+	/* set NAND clock divisor ( divior = 2000 MHz / CLK_RATE / 2) */
+	clrsetbits_le32(MVEBU_CORE_DIV_CLK_CTRL(1), NAND_ECC_DIVCKL_RATIO_MASK,
+			DIV_ROUND_UP(1000000000, CONFIG_SYS_MVEBU_NAND_CLOCK) <<
+				NAND_ECC_DIVCKL_RATIO_OFFS);
+#endif
 
 	/* Disable MBUS error propagation */
 	clrsetbits_le32(SOC_COHERENCY_FABRIC_CTRL_REG, MBUS_ERR_PROP_EN, 0);
@@ -549,7 +597,8 @@ void enable_caches(void)
 
 void v7_outer_cache_enable(void)
 {
-	if (mvebu_soc_family() == MVEBU_SOC_AXP) {
+	if (mvebu_soc_family() == MVEBU_SOC_AXP ||
+	    mvebu_soc_family() == MVEBU_SOC_A370) {
 		struct pl310_regs *const pl310 =
 			(struct pl310_regs *)CONFIG_SYS_PL310_BASE;
 		u32 u;

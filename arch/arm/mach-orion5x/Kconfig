@@ -8,11 +8,20 @@ config TARGET_EDMINIV2
 	bool "LaCie Ethernet Disk mini V2"
 	select SUPPORT_SPL
 
+config TARGET_KUROPRO
+	bool "Buffalo Kurobox Pro"
+	select CMD_POWEROFF
+
+config TARGET_LSGL
+	bool "Buffalo Linkstation Pro"
+	select CMD_POWEROFF
+
 endchoice
 
 config SYS_SOC
 	default "orion5x"
 
 source "board/LaCie/edminiv2/Kconfig"
+source "board/buffalo/lsgl/Kconfig"
 
 endif

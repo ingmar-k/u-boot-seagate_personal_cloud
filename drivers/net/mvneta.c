@@ -1379,6 +1379,11 @@ static int mvneta_mdio_read(struct mii_dev *bus, int addr, int devad, int reg)
 	u32 smi_reg;
 	u32 timeout;
 
+	/* Phyadr read requet */
+	if (addr == 0xEE && reg == 0xEE) {
+		return pp->phyaddr;
+	}
+
 	/* check parameters */
 	if (addr > MVNETA_PHY_ADDR_MASK) {
 		printf("Error: Invalid PHY address %d\n", addr);
@@ -1641,11 +1646,22 @@ static void mvneta_stop(struct udevice *dev)
 	mvneta_port_disable(pp);
 }
 
+static int mvneta_write_hwaddr(struct udevice *dev)
+{
+	struct mvneta_port *pp = dev_get_priv(dev);
+	struct eth_pdata *pdata = dev_get_platdata(dev);
+
+	mvneta_mac_addr_set(pp, pdata->enetaddr, rxq_def);
+
+	return 0;
+}
+
 static const struct eth_ops mvneta_ops = {
 	.start		= mvneta_start,
 	.send		= mvneta_send,
 	.recv		= mvneta_recv,
 	.stop		= mvneta_stop,
+	.write_hwaddr	= mvneta_write_hwaddr,
 };
 
 static int mvneta_ofdata_to_platdata(struct udevice *dev)

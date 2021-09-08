@@ -1,0 +1,7 @@
+LS400 BOARD
+M:	Steve Shih <shihsung@gmail.com>
+S:	Maintained
+F:	board/buffalo/ls400/
+F:	include/configs/ls400.h
+F:	configs/ls420_defconfig
+F:	configs/ls440_defconfig

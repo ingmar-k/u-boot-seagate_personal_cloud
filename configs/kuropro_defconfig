@@ -1,0 +1,33 @@
+CONFIG_ARM=y
+CONFIG_ORION5X=y
+CONFIG_TARGET_KUROPRO=y
+CONFIG_SYS_EXTRA_OPTIONS="SYS_ROMBOOT"
+CONFIG_SYS_PROMPT="KUROPRO> "
+CONFIG_SYS_NS16550=y
+
+# CONFIG_BOOTM_NETBSD is not set
+# CONFIG_BOOTM_PLAN9 is not set
+# CONFIG_BOOTM_RTEMS is not set
+# CONFIG_BOOTM_VXWORKS is not set
+
+# CONFIG_CMD_CRC32 is not set
+# CONFIG_CMD_EXPORTENV is not set
+# CONFIG_CMD_IMPORTENV is not set
+
+# CONFIG_CMD_BDI is not set
+# CONFIG_CMD_ECHO is not set
+# CONFIG_CMD_FPGA is not set
+# CONFIG_CMD_ITEST is not set
+# CONFIG_CMD_IMLS is not set
+# CONFIG_CMD_LOADB is not set
+# CONFIG_CMD_LOADS is not set
+# CONFIG_CMD_MISC is not set
+# CONFIG_CMD_NFS is not set
+# CONFIG_CMD_SETGETDCR is not set
+# CONFIG_CMD_SOURCE is not set
+# CONFIG_CMD_XIMG is not set
+
+# CONFIG_CMD_ELF is not set
+# CONFIG_CMD_SETEXPR is not set
+
+# CONFIG_REGEX is not set

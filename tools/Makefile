@@ -162,6 +162,7 @@ ubsha1-objs := os_support.o ubsha1.o lib/sha1.o
 
 HOSTCFLAGS_ubsha1.o := -pedantic
 
+kwboot-objs := lib/crc32.o common/image.o kwboot.o
 hostprogs-$(CONFIG_KIRKWOOD) += kwboot
 hostprogs-$(CONFIG_ARCH_MVEBU) += kwboot
 hostprogs-y += proftool

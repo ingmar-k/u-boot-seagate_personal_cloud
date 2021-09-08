@@ -88,7 +88,36 @@ struct mvebu_pcie {
 static void __iomem *mvebu_pcie_membase = (void __iomem *)MBUS_PCI_MEM_BASE;
 #define PCIE_MEM_SIZE	(32 << 20)
 
-#if defined(CONFIG_ARMADA_38X)
+#if defined(CONFIG_ARMADA_370)
+#define PCIE_BASE(if)					\
+	(MVEBU_REG_PCIE_BASE + 0x40000 * (if))
+
+/*
+ * On A370 MV6710 these PEX ports are supported:
+ *  0 - Port 0.0
+ *  1 - Port 0.1
+ */
+#ifdef CONFIG_MVEBU_PCI_MAX
+#define MAX_PEX	CONFIG_MVEBU_PCI_MAX
+#else
+#define MAX_PEX 2
+#endif
+static struct mvebu_pcie pcie_bus[MAX_PEX];
+
+static void mvebu_get_port_lane(struct mvebu_pcie *pcie, int pex_idx,
+				int *mem_target, int *mem_attr)
+{
+	u8 port[] = { 0, 0 };
+	u8 lane[] = { 1, 0 };
+	u8 target[] = { 4, 8 };
+	u8 attr[] = { 0xe8, 0xe8 };
+
+	pcie->port = port[pex_idx];
+	pcie->lane = lane[pex_idx];
+	*mem_target = target[pex_idx];
+	*mem_attr = attr[pex_idx];
+}
+#elif defined(CONFIG_ARMADA_38X)
 #define PCIE_BASE(if)					\
 	((if) == 0 ?					\
 	 MVEBU_REG_PCIE_BASE + 0x40000 :		\

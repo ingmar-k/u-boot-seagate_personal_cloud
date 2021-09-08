@@ -296,11 +296,17 @@ typedef struct dram_mv_init {
 
 /* Board/Soc revisions define */
 enum board_rev {
+#ifdef CONFIG_ARMADA_370
+	A0,
+	A0_PCAC,
+	A0_RD
+#else
 	Z1,
 	Z1_PCAC,
 	Z1_RD_SLED,
 	A0,
 	A0_AMC
+#endif
 };
 
 typedef struct dram_modes {

@@ -61,6 +61,7 @@ enum cpu_attrib {
 
 enum {
 	MVEBU_SOC_AXP,
+	MVEBU_SOC_A370,
 	MVEBU_SOC_A375,
 	MVEBU_SOC_A38X,
 	MVEBU_SOC_UNKNOWN,

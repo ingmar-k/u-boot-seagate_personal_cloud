@@ -1,0 +1,268 @@
+/*
+ * (C) Copyright 2013, 2016
+ * Steve Shih <shihsung@gmail.com>
+ *
+ * SPDX-License-Identifier:	GPL-2.0+
+ */
+
+#ifndef _CONFIG_POGO_H
+#define _CONFIG_POGO_H
+
+/*
+ * Board specific configuration
+ */
+#define CONFIG_BUILD_TARGET		"u-boot.kwb"
+
+#ifdef CONFIG_POGO1
+#define CONFIG_SYS_KWD_CONFIG		$(CONFIG_BOARDDIR)/kwbimage-pogo1.cfg
+#define CONFIG_IDENT_BOARD		" POGO-E01"
+#define CONFIG_MACH_SHEEVAPLUG
+#define CONFIG_MACH_TYPE		MACH_TYPE_SHEEVAPLUG
+#define CONFIG_KW88F6281
+#define CONFIG_ETHADDR			02:08:8f:62:81:a0
+#elif defined(CONFIG_POGO2)
+#define CONFIG_SYS_KWD_CONFIG		$(CONFIG_BOARDDIR)/kwbimage-pogo1.cfg
+#define CONFIG_IDENT_BOARD		" POGO-E02"
+#define CONFIG_MACH_POGO_E02
+#define CONFIG_MACH_TYPE		MACH_TYPE_POGO_E02
+#define CONFIG_KW88F6281
+#define CONFIG_ETHADDR			02:08:8f:62:81:a0
+#elif defined(CONFIG_POGO4)
+#define CONFIG_SYS_KWD_CONFIG		$(CONFIG_BOARDDIR)/kwbimage-pogo4.cfg
+#define CONFIG_IDENT_BOARD		" POGOPLUG SERIES 4"
+#define CONFIG_MACH_POGOPLUGV4
+#define CONFIG_MACH_TYPE		MACH_TYPE_POGOPLUGV4
+#define CONFIG_KW88F6192
+#define CONFIG_ETHADDR			02:08:8f:61:92:a0
+#define CONFIG_KIRKWOOD_GPIO
+#define CONFIG_POGO_EJECT_BUTTON	29
+#define CONFIG_CMD_IDE
+#define CONFIG_CMD_MMC
+#elif defined(CONFIG_POGOM)
+#define CONFIG_SYS_KWD_CONFIG		$(CONFIG_BOARDDIR)/kwbimage-pogo4.cfg
+#define CONFIG_IDENT_BOARD		" POGOPLUG MOBILE"
+#define CONFIG_MACH_POGOPLUGV4
+#define CONFIG_MACH_TYPE		MACH_TYPE_POGOPLUGV4
+#define CONFIG_KW88F6192
+#define CONFIG_ETHADDR			02:08:8f:61:92:a0
+#define CONFIG_KIRKWOOD_GPIO
+#define CONFIG_POGO_EJECT_BUTTON	29
+#define CONFIG_CMD_MMC
+#elif defined(CONFIG_SHEEVA)
+#define CONFIG_SYS_KWD_CONFIG		$(CONFIG_BOARDDIR)/kwbimage-sheeva.cfg
+#define CONFIG_IDENT_BOARD		" SHEEVA PLUG"
+#define CONFIG_MACH_SHEEVAPLUG
+#define CONFIG_MACH_TYPE		MACH_TYPE_SHEEVAPLUG
+#define CONFIG_KW88F6281
+#define CONFIG_ETHADDR			02:08:8f:62:81:a0
+#define CONFIG_CMD_MMC
+#endif
+
+/*
+ * Board specific Kirkwood MPP configuration
+ */
+#if defined(CONFIG_TARGET_POGO1) || defined(CONFIG_TARGET_POGO2)
+#define KIRKWOOD_MPP_0_7		0x01111111
+#define KIRKWOOD_MPP_8_15		0x11113322
+#define KIRKWOOD_MPP_16_23		0x00001111
+#define KIRKWOOD_MPP_24_31		0x00000000
+#define KIRKWOOD_MPP_32_39		0x00000000
+#define KIRKWOOD_MPP_40_47		0x00000000
+#define KIRKWOOD_MPP_48_49		0x00000000
+#elif defined(CONFIG_TARGET_POGO4) || defined(CONFIG_TARGET_POGOM)
+#define KIRKWOOD_MPP_0_7		0x21111111
+#define KIRKWOOD_MPP_8_15		0x11113311
+#define KIRKWOOD_MPP_16_23		0x00551111
+#define KIRKWOOD_MPP_24_31		0x00000000
+#define KIRKWOOD_MPP_32_39		0x00000000
+#define KIRKWOOD_MPP_40_47		0x00000000
+#define KIRKWOOD_MPP_48_49		0x00000000
+#elif defined(CONFIG_TARGET_SHEEVA)
+#define KIRKWOOD_MPP_0_7		0x01111111
+#define KIRKWOOD_MPP_8_15		0x11113322
+#define KIRKWOOD_MPP_16_23		0x00001111
+#define KIRKWOOD_MPP_24_31		0x00000000
+#define KIRKWOOD_MPP_32_39		0x00000000
+#define KIRKWOOD_MPP_40_47		0x00000000
+#define KIRKWOOD_MPP_48_49		0x00000000
+#endif
+
+/*
+ * Board specific Kirkwood GPIO configuraton
+ */
+#if defined(CONFIG_TARGET_POGO1)
+#define KIRKWOOD_GPIO_LO_OUT_VAL	0xeff00000
+#define KIRKWOOD_GPIO_LO_OUT_ENA	0xcfffffff
+#define KIRKWOOD_GPIO_LO_BLINK_ENA	0x00000000
+#define KIRKWOOD_GPIO_HI_OUT_VAL	0xffffffff
+#define KIRKWOOD_GPIO_HI_OUT_ENA	0xfffc3fff
+#define KIRKWOOD_GPIO_HI_BLINK_ENA	0x00018000
+#elif defined(CONFIG_TARGET_POGO2)
+#define KIRKWOOD_GPIO_LO_OUT_VAL	0xeff00000
+#define KIRKWOOD_GPIO_LO_OUT_ENA	0xefffffff
+#define KIRKWOOD_GPIO_LO_BLINK_ENA	0x00000000
+#define KIRKWOOD_GPIO_HI_OUT_VAL	0xffffffff
+#define KIRKWOOD_GPIO_HI_OUT_ENA	0xfffc3fff
+#define KIRKWOOD_GPIO_HI_BLINK_ENA	0x00010000
+#elif defined(CONFIG_TARGET_POGO4) || defined(CONFIG_TARGET_POGOM)
+#define KIRKWOOD_GPIO_LO_OUT_VAL	0x0101c441
+#define KIRKWOOD_GPIO_LO_OUT_ENA	0xee004800
+#define KIRKWOOD_GPIO_LO_BLINK_ENA	0x00400000
+#define KIRKWOOD_GPIO_HI_OUT_VAL	0x00000008
+#define KIRKWOOD_GPIO_HI_OUT_ENA	0x00000005
+#define KIRKWOOD_GPIO_HI_BLINK_ENA	0x00000000
+#elif defined(CONFIG_TARGET_SHEEVA)
+#define KIRKWOOD_GPIO_LO_OUT_VAL	0x20000000
+#define KIRKWOOD_GPIO_LO_OUT_ENA	0x00000000
+#define KIRKWOOD_GPIO_LO_BLINK_ENA	0x00000000
+#define KIRKWOOD_GPIO_HI_OUT_VAL	0xfffcffff
+#define KIRKWOOD_GPIO_HI_OUT_ENA	0x00008000
+#define KIRKWOOD_GPIO_HI_BLINK_ENA	0x00020000
+#endif
+
+/*
+ * SoC configuration
+ */
+#define CONFIG_FEROCEON_88FR131
+
+/*
+ * Miscellaneous SoC configuration
+ */
+#define CONFIG_KIRKWOOD_EGIGA1_DISABLE
+
+/*
+ * Memory configuration
+ */
+#define CONFIG_SYS_TEXT_BASE		0x00080000
+
+/*
+ * Init configuration
+ */
+#define CONFIG_SKIP_LOWLEVEL_INIT
+#define CONFIG_BOARD_LATE_INIT
+#define CONFIG_LAST_STAGE_INIT
+
+/*
+ * Console configuration
+ */
+#define CONFIG_SYS_CONSOLE_IS_IN_ENV
+#define CONFIG_SYS_CONSOLE_OVERWRITE_ROUTINE
+
+/*
+ * Flash configuration
+ */
+#define CONFIG_SYS_NO_FLASH
+
+/*
+ * Environment configuration
+ */
+#define CONFIG_ENV_IS_IN_NAND		1
+#define CONFIG_ENV_OFFSET		0xc0000
+#define CONFIG_ENV_SIZE			0x20000
+
+/*
+ * Auto-boot configuration
+ */
+#define CONFIG_ZERO_BOOTDELAY_CHECK
+
+/*
+ * Linux boot configuration
+ */
+#define CONFIG_SYS_PARAMS_PHYS		0x00000100
+
+/*
+ * Command configuration
+ */
+#define CONFIG_CMD_DATE
+#define CONFIG_CMD_GREPENV
+#define CONFIG_CMD_MEMINFO
+#define CONFIG_CMD_NAND
+#define CONFIG_CMD_READ
+#define CONFIG_CMD_TFTPPUT
+#define CONFIG_CMD_TIME
+#define CONFIG_CMD_TIMER
+#define CONFIG_CMD_USB
+
+/*
+ * CMD_DATE and RTC configuration
+ */
+#ifdef CONFIG_CMD_DATE
+#define CONFIG_RTC_MV
+#endif
+
+/*
+ * CMD_IDE configuration
+ */
+#ifdef CONFIG_CMD_IDE
+#define CONFIG_SYS_ATA_IDE0_OFFSET	KW_SATA_PORT0_OFFSET
+#define CONFIG_SYS_64BIT_LBA
+#endif
+
+/*
+ * CMD_MMC configuration
+ */
+#ifdef CONFIG_CMD_MMC
+#define CONFIG_GENERIC_MMC
+#define CONFIG_MVEBU_MMC
+#define CONFIG_SYS_MMC_BASE		KW_SDIO_BASE
+#define CONFIG_MMC
+#endif
+
+/*
+ * CMD_NAND configuration
+ */
+#ifdef CONFIG_CMD_NAND
+#define CONFIG_MTD_DEVICE
+#define CONFIG_MTD_PARTITIONS
+#define CONFIG_CMD_MTDPARTS
+#define MTDIDS_DEFAULT			"nand0=orion-nand"
+#define MTDPARTS_DEFAULT		"mtdparts=orion-nand:" \
+		"0xc0000(U-Boot),0x40000@0xc0000(ENV),-@0x100000(UBIFS)"
+#define CONFIG_CMD_UBI
+#define CONFIG_CMD_UBIFS
+#define CONFIG_RBTREE
+#define CONFIG_LZO
+#else
+#define CONFIG_ENV_IS_NOWHERE
+#endif
+
+/*
+ * CMD_NET configuration
+ */
+#ifdef CONFIG_CMD_NET
+#define CONFIG_MVGBE_PORTS		{1}
+#define CONFIG_PHY_BASE_ADR		0
+#define CONFIG_SYS_FAULT_ECHO_LINK_DOWN
+#define CONFIG_PHY_GIGE
+#define CONFIG_CMD_PING
+#define CONFIG_IPADDR			192.168.11.150
+#define CONFIG_NETMASK			255.255.255.0
+#define CONFIG_SERVERIP			192.168.11.1
+#define CONFIG_EXTRA_ENV_SETTINGS	"stdin=nc\0" \
+					"stdout=nc\0" \
+					"stderr=nc"
+#endif
+
+/*
+ * CMD_USB configuration
+ */
+#ifdef CONFIG_CMD_USB
+#endif
+
+/*
+ * Filesystem configuration
+ */
+#if defined(CONFIG_CMD_IDE)||defined(CONFIG_CMD_MMC)||defined(CONFIG_CMD_USB)
+#define CONFIG_DOS_PARTITION
+#define CONFIG_EFI_PARTITION
+#define CONFIG_CMD_FAT
+#define CONFIG_FAT_WRITE
+#define CONFIG_CMD_EXT2
+#define CONFIG_CMD_EXT4
+#define CONFIG_CMD_EXT4_WRITE
+#define CONFIG_CMD_FS_GENERIC
+#endif
+
+#include "mv-common.h"
+
+#endif

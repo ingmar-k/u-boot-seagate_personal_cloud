@@ -1,0 +1,338 @@
+/*
+ * (C) Copyright 2014, 2016
+ * Steve Shih <shihsung@gmail.com>
+ *
+ * SPDX-License-Identifier:	GPL-2.0+
+ */
+
+#ifndef _CONFIG_LS400_H
+#define _CONFIG_LS400_H
+
+/*
+ * Board specific configuration
+ */
+#ifdef CONFIG_TARGET_LS420
+#define CONFIG_IDENT_STRING		" LinkStation 420 Series NAS"
+#define CONFIG_CMD_IDE
+#define CONFIG_MVEBU_PCI_MAX		1
+#elif defined(CONFIG_TARGET_LS440)
+#define CONFIG_IDENT_STRING		" LinkStation 440 Series NAS"
+#define CONFIG_CMD_SCSI
+#endif
+
+/*
+ * Board specific MPP configuration
+ */
+#ifdef CONFIG_TARGET_LS420
+#define LS400_MPP_0_7			0x00011111
+#define LS400_MPP_8_15			0x00000000
+#define LS400_MPP_16_23			0x22222110
+#define LS400_MPP_24_31			0x02222222
+#define LS400_MPP_32_39			0x11111111
+#define LS400_MPP_40_47			0x31111111
+#define LS400_MPP_48_55			0x00033333
+#define LS400_MPP_56_63			0x10040005
+#define LS400_MPP_64_65			0x00000011
+#elif defined(CONFIG_TARGET_LS440)
+#define LS400_MPP_0_7			0x00011111
+#define LS400_MPP_8_15			0x00000000
+#define LS400_MPP_16_23			0x22222110
+#define LS400_MPP_24_31			0x02222222
+#define LS400_MPP_32_39			0x11111111
+#define LS400_MPP_40_47			0x01111111
+#define LS400_MPP_48_55			0x00500000
+#define LS400_MPP_56_63			0x10000005
+#define LS400_MPP_64_65			0x00000011
+#endif
+
+/*
+ * Board specific GPIO configuration
+ */
+#ifdef CONFIG_TARGET_LS420
+#define LS400_GPIO_LO_OUT_KEEP		0x00000300	/* keep HD power */
+#define LS400_GPIO_LO_OUT_VAL		0x00002020
+#define LS400_GPIO_LO_OUT_ENA		0xffff9c5f
+#define LS400_GPIO_LO_BLINK_ENA		0x00000000
+#define LS400_GPIO_LO_IN_POL		0x00000000
+#define LS400_GPIO_LO_BLINK_SEL		0x00000000
+#define LS400_GPIO_MID_OUT_VAL		0x00400000
+#define LS400_GPIO_MID_OUT_ENA		0x913fffff
+#define LS400_GPIO_MID_BLINK_ENA	0x00400000
+#define LS400_GPIO_MID_IN_POL		0x00000000
+#define LS400_GPIO_MID_BLINK_SEL	0x00000000
+#define LS400_GPIO_HI_OUT_VAL		0x00000000
+#define LS400_GPIO_HI_OUT_ENA		0x00000003
+#define LS400_GPIO_HI_BLINK_ENA		0x00000000
+#define LS400_GPIO_HI_IN_POL		0x00000000
+#define LS400_GPIO_HI_BLINK_SEL		0x00000000
+#elif defined(CONFIG_TARGET_LS440)
+#define LS400_GPIO_LO_OUT_KEEP		0x00000180	/* keep HD power */
+#define LS400_GPIO_LO_OUT_VAL		0x00002020
+#define LS400_GPIO_LO_OUT_ENA		0xffff9c5f
+#define LS400_GPIO_LO_BLINK_ENA		0x00000020
+#define LS400_GPIO_LO_IN_POL		0x80006000
+#define LS400_GPIO_LO_BLINK_SEL		0x00000000
+#define LS400_GPIO_MID_OUT_KEEP		0x00120000	/* keep HD power */
+#define LS400_GPIO_MID_OUT_VAL		0x00000000
+#define LS400_GPIO_MID_OUT_ENA		0x812c7fff
+#define LS400_GPIO_MID_BLINK_ENA	0x00000000
+#define LS400_GPIO_MID_IN_POL		0x00000000
+#define LS400_GPIO_MID_BLINK_SEL	0x00000000
+#define LS400_GPIO_HI_OUT_VAL		0x00000000
+#define LS400_GPIO_HI_OUT_ENA		0x00000002
+#define LS400_GPIO_HI_BLINK_ENA		0x00000000
+#define LS400_GPIO_HI_IN_POL		0x00000000
+#define LS400_GPIO_HI_BLINK_SEL		0x00000000
+#endif
+
+/*
+ * SoC configuration
+ */
+#define CONFIG_SYS_L2CLK		600000000
+#define CONFIG_SYS_TCLK			200000000
+
+/*
+ * Miscellaneous SoC configuration
+ */
+#ifdef CONFIG_TARGET_LS420
+#define LS400_PM_CLK_GATING_CTRL	0xf1ccc23a
+#elif defined(CONFIG_TARGET_LS440)
+#define LS400_PM_CLK_GATING_CTRL	0x91cc023e
+#endif
+
+/*
+ * Memory configuration
+ */
+#define CONFIG_SYS_TEXT_BASE		0x00080000
+
+/*
+ * Init configuration
+ */
+#define CONFIG_BOARD_LATE_INIT
+#define CONFIG_LAST_STAGE_INIT	
+
+/*
+ * Console configuration
+ */
+#define CONFIG_SYS_CONSOLE_IS_IN_ENV
+#define CONFIG_SYS_CONSOLE_OVERWRITE_ROUTINE
+
+/*
+ * Flash configuration
+ */
+#define CONFIG_SYS_NO_FLASH
+
+/*
+ * Environment configuration
+ */
+#define CONFIG_ENV_IS_IN_SPI_FLASH
+#define CONFIG_ENV_OFFSET		0xf0000
+#define CONFIG_ENV_SIZE			CONFIG_ENV_SECT_SIZE
+#define CONFIG_ENV_SECT_SIZE		0x10000
+
+/*
+ * Auto-boot configuration
+ */
+#define CONFIG_ZERO_BOOTDELAY_CHECK
+
+/*
+ * Linux boot configuration
+ */
+#define CONFIG_SYS_PARAMS_PHYS		0x00000100
+
+/*
+ * Command configuration
+ */
+#define CONFIG_CMD_DATE
+#define CONFIG_CMD_GREPENV
+#define CONFIG_CMD_MEMINFO
+#define CONFIG_CMD_NAND
+#define CONFIG_CMD_PCI
+#define CONFIG_CMD_READ
+#define CONFIG_CMD_SF
+#define CONFIG_CMD_TFTPPUT
+#define CONFIG_CMD_TIME
+#define CONFIG_CMD_TIMER
+#define CONFIG_CMD_USB
+
+/*
+ * CMD_DATE configuration
+ */
+#ifdef CONFIG_CMD_DATE
+#define CONFIG_RTC_RS5C372A
+#define CONFIG_CMD_I2C
+#endif
+
+/*
+ * CMD_I2C configuration
+ */
+#ifdef CONFIG_CMD_I2C
+#define CONFIG_SYS_I2C
+#define CONFIG_SYS_I2C_MVTWSI
+#define CONFIG_I2C_MVTWSI_BASE0		MVEBU_TWSI_BASE
+#endif
+
+/*
+ * CMD_IDE configuration
+ */
+#ifdef CONFIG_CMD_IDE
+#define CONFIG_MVSATA_IDE
+#define CONFIG_SYS_ATA_BASE_ADDR	MVEBU_AXP_SATA_BASE
+#define CONFIG_SYS_ATA_IDE0_OFFSET	0x2000
+#define CONFIG_SYS_ATA_IDE1_OFFSET	0x4000
+#define CONFIG_SYS_ATA_DATA_OFFSET	0x0100
+#define CONFIG_SYS_ATA_REG_OFFSET	0x0100
+#define CONFIG_SYS_ATA_ALT_OFFSET	0x0100
+#define CONFIG_SYS_ATA_STRIDE		4
+#define __io
+#define CONFIG_IDE_SWAP_IO
+#define CONFIG_SYS_IDE_MAXBUS		2
+#define CONFIG_SYS_IDE_MAXDEVICE	2
+#define ATA_DEVICE(x)			0
+#define CONFIG_IDE_PREINIT
+#define CONFIG_LBA48
+#define CONFIG_SYS_64BIT_LBA
+#endif
+
+/*
+ * CMD_NAND configuration
+ */
+#ifdef CONFIG_CMD_NAND
+#define CONFIG_NAND_PXA3XX
+#define CONFIG_SYS_NAND_SELF_INIT
+#define CONFIG_SYS_MVEBU_NAND_CLOCK	250000000	/* 250 MHz */
+#define CONFIG_SYS_NAND_USE_FLASH_BBT
+#define CONFIG_SYS_NAND_KEEP_CONFIG
+#define CONFIG_SYS_NAND_ECC_STRENGTH	4
+#define CONFIG_SYS_NAND_ECC_STEP_SIZE	512
+#define CONFIG_SYS_NAND_ONFI_DETECTION
+#define CONFIG_MTD_DEVICE
+#define CONFIG_MTD_PARTITIONS
+#define CONFIG_CMD_MTDPARTS
+#define MTDIDS_DEFAULT			"nand0=armada370-nand"
+#define MTDPARTS_DEFAULT		"mtdparts=armada370-nand:-(UBIFS)"
+#define CONFIG_CMD_UBI
+#define CONFIG_CMD_UBIFS
+#define CONFIG_RBTREE
+#define CONFIG_LZO
+#endif
+
+/*
+ * CMD_NET configuration
+ */
+#ifdef CONFIG_CMD_NET
+#define CONFIG_RESET_PHY_R
+#define CONFIG_SYS_FAULT_ECHO_LINK_DOWN
+#define PHY_ANEG_TIMEOUT		15000
+#define CONFIG_ETHADDR			02:08:8f:67:10:a1
+#define CONFIG_NETCONSOLE
+#define CONFIG_CMD_PING
+#define CONFIG_IPADDR			192.168.11.150
+#define CONFIG_NETMASK			255.255.255.0
+#define CONFIG_SERVERIP			192.168.11.1
+#define CONFIG_EXTRA_ENV_SETTINGS	"stdin=nc\0" \
+					"stdout=nc\0" \
+					"stderr=nc"
+#endif
+
+/*
+ * CMD_PCI configuration
+ */
+#ifdef CONFIG_CMD_PCI
+#define CONFIG_PCI_MVEBU
+#define CONFIG_PCI
+#define CONFIG_PCI_PNP
+#define CONFIG_SCAN_SHOW
+#endif
+
+/*
+ * CMD_SCSI configuration
+ */
+#ifdef CONFIG_CMD_SCSI
+#define CONFIG_LIBATA
+#define CONFIG_SCSI_AHCI
+#define CONFIG_SCSI_DEV_LIST		{ 0x1b4b, 0x9215 }
+#define CONFIG_SYS_SCSI_MAX_SCSI_ID	4
+#define CONFIG_SYS_SCSI_MAX_LUN		1
+#define CONFIG_SYS_SCSI_MAX_DEVICE	(CONFIG_SYS_SCSI_MAX_SCSI_ID * \
+					 CONFIG_SYS_SCSI_MAX_LUN)
+#define CONFIG_LBA48
+#define CONFIG_SYS_64BIT_LBA
+#endif
+
+/*
+ * CMD_SF configuration
+ */
+#ifdef CONFIG_CMD_SF
+#define CONFIG_CMD_SPI
+/* Boot time probe */
+#define CONFIG_ENV_SPI_BUS		0
+#define CONFIG_ENV_SPI_CS		0
+#define CONFIG_ENV_SPI_MODE		SPI_MODE_3
+#define CONFIG_ENV_SPI_MAX_HZ		80000000 /* 86 MHz MAX for MX25L8006E */
+/* Post boot time probe */
+#define CONFIG_SF_DEFAULT_BUS		CONFIG_ENV_SPI_BUS
+#define CONFIG_SF_DEFAULT_CS		CONFIG_ENV_SPI_CS
+#define CONFIG_SF_DEFAULT_MODE		CONFIG_ENV_SPI_MODE
+#define CONFIG_SF_DEFAULT_SPEED		CONFIG_ENV_SPI_MAX_HZ
+#else
+#define CONFIG_ENV_IS_NOWHERE
+#endif
+
+/*
+ * CMD_USB configuration
+ */
+#ifdef CONFIG_CMD_USB
+#define CONFIG_DM_USB
+#define CONFIG_USB_EHCI_MARVELL
+#define CONFIG_USB_EHCI
+#define CONFIG_EHCI_IS_TDI
+#define CONFIG_USB_STORAGE
+#endif
+
+/*
+ * Filesystem configuration
+ */
+#if defined(CONFIG_CMD_IDE) || defined(CONFIG_CMD_SCSI) || defined(CONFIG_CMD_USB)
+#define CONFIG_DOS_PARTITION
+#define CONFIG_EFI_PARTITION
+#define CONFIG_CMD_FAT
+#define CONFIG_FAT_WRITE
+#define CONFIG_CMD_EXT2
+#define CONFIG_CMD_EXT4
+#define CONFIG_CMD_EXT4_WRITE
+#define CONFIG_CMD_FS_GENERIC
+#endif
+
+#include "mv-common.h"
+
+/*
+ * SPL configuration
+ */
+#ifdef CONFIG_SPL_BUILD
+#define CONFIG_SPL_FRAMEWORK
+#define CONFIG_SPL_TEXT_BASE		0x40004030
+#define CONFIG_SPL_MAX_SIZE		((128 << 10) - 0x4030)
+
+#define CONFIG_SPL_BSS_START_ADDR	(0x40000000 + (128 << 10))
+#define CONFIG_SPL_BSS_MAX_SIZE		(16 << 10)
+
+#define CONFIG_SPL_STACK		(0x40000000 + ((192 - 16) << 10))
+#define CONFIG_SPL_BOOTROM_SAVE		(CONFIG_SPL_STACK + 4)
+
+#define CONFIG_SPL_LIBCOMMON_SUPPORT
+#define CONFIG_SPL_LIBGENERIC_SUPPORT
+#define CONFIG_SPL_SERIAL_SUPPORT
+
+/* SPL related SPI defines */
+#define CONFIG_SPL_SPI_SUPPORT
+#define CONFIG_SPL_SPI_FLASH_SUPPORT
+#define CONFIG_SPL_SPI_LOAD
+
+#define CONFIG_DDR_FIXED_SIZE		0x20000000	/* 512 MB */
+#endif
+
+#define CONFIG_SYS_SPI_U_BOOT_OFFS	0x20000
+#define CONFIG_SYS_U_BOOT_OFFS		CONFIG_SYS_SPI_U_BOOT_OFFS
+
+#endif

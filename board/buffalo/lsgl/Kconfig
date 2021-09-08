@@ -1,0 +1,12 @@
+if TARGET_KUROPRO || TARGET_LSGL
+
+config SYS_BOARD
+	default "lsgl"
+
+config SYS_VENDOR
+	default "buffalo"
+
+config SYS_CONFIG_NAME
+	default "lsgl"
+
+endif

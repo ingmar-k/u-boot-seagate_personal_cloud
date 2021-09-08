@@ -251,9 +251,12 @@ int arch_cpu_init(void)
 	reg = readl(KWGBE_PORT_SERIAL_CONTROL1_REG(0));
 	reg &= ~(1 << 4);	/* Clear PortReset Bit */
 	writel(reg, (KWGBE_PORT_SERIAL_CONTROL1_REG(0)));
+/* workaround RAMBOOT reading EGIGA1 Port Serial Control1 Register hang */
+#ifndef CONFIG_KIRKWOOD_EGIGA1_DISABLE
 	reg = readl(KWGBE_PORT_SERIAL_CONTROL1_REG(1));
 	reg &= ~(1 << 4);	/* Clear PortReset Bit */
 	writel(reg, (KWGBE_PORT_SERIAL_CONTROL1_REG(1)));
+#endif
 #endif
 #ifdef CONFIG_KIRKWOOD_PCIE_INIT
 	/*

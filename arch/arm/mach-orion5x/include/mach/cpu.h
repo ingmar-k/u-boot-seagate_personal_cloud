@@ -239,5 +239,6 @@ u32 orion5x_device_id(void);
 u32 orion5x_device_rev(void);
 unsigned int orion5x_winctrl_calcsize(unsigned int sizeval);
 void timer_init_r(void);
+void orion5x_usb_workaround(unsigned long port_base);
 #endif /* __ASSEMBLY__ */
 #endif /* _ORION5X_CPU_H */

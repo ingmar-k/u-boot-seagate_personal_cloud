@@ -329,6 +329,7 @@ static const struct dm_spi_ops mvebu_spi_ops = {
 };
 
 static const struct udevice_id mvebu_spi_ids[] = {
+	{ .compatible = "marvell,armada-370-spi" },
 	{ .compatible = "marvell,armada-375-spi" },
 	{ .compatible = "marvell,armada-380-spi" },
 	{ .compatible = "marvell,armada-xp-spi" },

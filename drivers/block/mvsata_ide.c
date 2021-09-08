@@ -21,7 +21,9 @@
 struct mvsata_port_registers {
 	u32 reserved0[10];
 	u32 edma_cmd;
-	u32 reserved1[181];
+	u32 reserved1[2];
+	u32 iordy_timeout;
+	u32 reserved2[178];
 	/* offset 0x300 : ATA Interface registers */
 	u32 sstatus;
 	u32 serror;
@@ -29,7 +31,7 @@ struct mvsata_port_registers {
 	u32 ltmode;
 	u32 phymode3;
 	u32 phymode4;
-	u32 reserved2[5];
+	u32 reserved3[5];
 	u32 phymode1;
 	u32 phymode2;
 	u32 bist_cr;
@@ -91,6 +93,43 @@ struct mvsata_port_registers {
 #define MVSATA_STATUS_OK	0
 #define MVSATA_STATUS_TIMEOUT	-1
 
+#if defined(CONFIG_ARMADA_370)
+/*
+ * From Linux: mv_soc_65n_phy_errata() in drivers/ata/sata_mv.c
+ */
+static void mvsata_soc_65n_phy_errata(struct mvsata_port_registers *port)
+{
+	u8 *port_mmio = (u8*)port;
+	u32 reg;
+
+	reg = readl(&port->phymode3);
+	reg &= ~(0x3 << 27);	/* SELMUPF (bits 28:27) to 1 */
+	reg |= (0x1 << 27);
+	reg &= ~(0x3 << 29);	/* SELMUPI (bits 30:29) to 1 */
+	reg |= (0x1 << 29);
+	writel(reg, &port->phymode3);
+
+	reg = readl(&port->phymode4);
+	reg &= ~0x1;	/* SATU_OD8 (bit 0) to 0, reserved bit 16 must be set */
+	reg |= (0x1 << 16);
+	writel(reg, &port->phymode4);
+
+#define PHY_MODE9_GEN2			0x0398
+	reg = readl(port_mmio + PHY_MODE9_GEN2);
+	reg &= ~0xf;	/* TXAMP[3:0] (bits 3:0) to 8 */
+	reg |= 0x8;
+	reg &= ~(0x1 << 14);	/* TXAMP[4] (bit 14) to 0 */
+	writel(reg, port_mmio + PHY_MODE9_GEN2);
+
+#define PHY_MODE9_GEN1			0x039c
+	reg = readl(port_mmio + PHY_MODE9_GEN1);
+	reg &= ~0xf;	/* TXAMP[3:0] (bits 3:0) to 8 */
+	reg |= 0x8;
+	reg &= ~(0x1 << 14);	/* TXAMP[4] (bit 14) to 0 */
+	writel(reg, port_mmio + PHY_MODE9_GEN1);
+}
+#endif
+
 /*
  * Registers for SATA MBUS memory windows
  */
@@ -143,6 +182,14 @@ static int mvsata_ide_initialize_port(struct mvsata_port_registers *port)
 	writel(MVSATA_EDMA_CMD_ATA_RST, &port->edma_cmd);
 	udelay(25); /* taken from original marvell port */
 	writel(0, &port->edma_cmd);
+
+#if defined(CONFIG_ARMADA_370)
+	mvsata_soc_65n_phy_errata(port);
+#endif
+
+	/* SATA IORdy time-out is 1250 ns */
+	writel(DIV_ROUND_UP(CONFIG_SYS_TCLK / 1000000 * 1250, 1000),
+		&port->iordy_timeout);
 
 	/* Set control IPM to 3 (no low power) and DET to 1 (initialize) */
 	control = readl(&port->scontrol);

@@ -1,0 +1,10 @@
+POGO BOARD
+M:	Steve Shih <shihsung@gmail.com>
+S:	Maintained
+F:	board/cloudengines/pogo/
+F:	include/configs/pogo.h
+F:	configs/pogo1_defconfig
+F:	configs/pogo2_defconfig
+F:	configs/pogo4_defconfig
+F:	configs/pogom_defconfig
+F:	configs/sheeva_defconfig

@@ -1,0 +1,12 @@
+if TARGET_POGO1 || TARGET_POGO2 || TARGET_POGO4 || TARGET_POGOM || TARGET_SHEEVA
+
+config SYS_BOARD
+	default "pogo"
+
+config SYS_VENDOR
+	default "cloudengines"
+
+config SYS_CONFIG_NAME
+	default "pogo"
+
+endif

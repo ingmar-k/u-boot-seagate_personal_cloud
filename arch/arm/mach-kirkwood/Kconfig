@@ -19,6 +19,21 @@ config TARGET_SHEEVAPLUG
 config TARGET_LSXL
 	bool "lsxl Board"
 
+config TARGET_POGO1
+	bool "Pogo Plug 1 Board"
+
+config TARGET_POGO2
+	bool "Pogo Plug 2 Board"
+
+config TARGET_POGO4
+	bool "Pogo Plug 4 Board"
+
+config TARGET_POGOM
+	bool "Pogo Plug M Board"
+
+config TARGET_SHEEVA
+	bool "Sheeva Plug Board"
+
 config TARGET_POGO_E02
 	bool "pogo_e02 Board"
 
@@ -62,6 +77,7 @@ source "board/Marvell/dreamplug/Kconfig"
 source "board/Marvell/guruplug/Kconfig"
 source "board/Marvell/sheevaplug/Kconfig"
 source "board/buffalo/lsxl/Kconfig"
+source "board/cloudengines/pogo/Kconfig"
 source "board/cloudengines/pogo_e02/Kconfig"
 source "board/d-link/dns325/Kconfig"
 source "board/iomega/iconnect/Kconfig"

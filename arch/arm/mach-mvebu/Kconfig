@@ -9,6 +9,15 @@ config ARMADA_38X
 config ARMADA_XP
 	bool
 
+config ARMADA_370
+	bool
+
+config LS400
+	bool
+	select ARMADA_370
+	select CMD_POWEROFF
+	select DM_GPIO
+
 config MV78230
 	bool
 	select ARMADA_XP
@@ -26,7 +35,7 @@ config DB_88F6820_GP
 	select ARMADA_38X
 
 choice
-	prompt "Marvell MVEBU (Armada XP/375/38x) board select"
+	prompt "Marvell MVEBU (Armada XP/370/375/38x) board select"
 	optional
 
 config TARGET_CLEARFOG
@@ -49,6 +58,14 @@ config TARGET_DS414
 	bool "Support Synology DS414"
 	select MV78230
 
+config TARGET_LS420
+	bool "Support Buffalo LinkStation 420 Series NAS"
+	select LS400
+
+config TARGET_LS440
+	bool "Support Buffalo LinkStation 440 Series NAS"
+	select LS400
+
 config TARGET_MAXBCM
 	bool "Support maxbcm"
 	select MV78460
@@ -65,6 +82,7 @@ config SYS_BOARD
 	default "db-88f6820-gp" if TARGET_DB_88F6820_GP
 	default "db-mv784mp-gp" if TARGET_DB_MV784MP_GP
 	default "ds414" if TARGET_DS414
+	default "ls400" if LS400
 	default "maxbcm" if TARGET_MAXBCM
 	default "theadorable" if TARGET_THEADORABLE
 
@@ -74,10 +92,12 @@ config SYS_CONFIG_NAME
 	default "db-88f6820-gp" if TARGET_DB_88F6820_GP
 	default "db-mv784mp-gp" if TARGET_DB_MV784MP_GP
 	default "ds414" if TARGET_DS414
+	default "ls400" if LS400
 	default "maxbcm" if TARGET_MAXBCM
 	default "theadorable" if TARGET_THEADORABLE
 
 config SYS_VENDOR
+	default "buffalo" if LS400
 	default "Marvell" if TARGET_DB_MV784MP_GP
 	default "Marvell" if TARGET_DB_88F6720
 	default "Marvell" if TARGET_DB_88F6820_GP

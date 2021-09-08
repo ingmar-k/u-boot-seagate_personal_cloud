@@ -234,9 +234,18 @@ int arch_cpu_init(void)
 	/* Enable and invalidate L2 cache in write through mode */
 	invalidate_l2_cache();
 
-#ifdef CONFIG_SPL_BUILD
+#if defined(CONFIG_SPL_BUILD) || defined(CONFIG_SYS_ROMBOOT)
 	orion5x_config_adr_windows();
 #endif
+
+	/* Set GPIOs and MPPs - values provided by board
+	   include file */
+	writel(ORION5X_MPP0_7, ORION5X_MPP_BASE+0x00);
+	writel(ORION5X_MPP8_15, ORION5X_MPP_BASE+0x04);
+	writel(ORION5X_MPP16_23, ORION5X_MPP_BASE+0x50);
+	writel(ORION5X_GPIO_OUT_VALUE, ORION5X_GPIO_BASE+0x00);
+	writel(ORION5X_GPIO_OUT_ENABLE, ORION5X_GPIO_BASE+0x04);
+	writel(ORION5X_GPIO_IN_POLARITY, ORION5X_GPIO_BASE+0x0c);
 
 	return 0;
 }
@@ -272,17 +281,17 @@ int arch_misc_init(void)
 	temp = get_cr();
 	set_cr(temp & ~CR_V);
 
-	/* Set CPIOs and MPPs - values provided by board
-	   include file */
-	writel(ORION5X_MPP0_7, ORION5X_MPP_BASE+0x00);
-	writel(ORION5X_MPP8_15, ORION5X_MPP_BASE+0x04);
-	writel(ORION5X_MPP16_23, ORION5X_MPP_BASE+0x50);
-	writel(ORION5X_GPIO_OUT_VALUE, ORION5X_GPIO_BASE+0x00);
-	writel(ORION5X_GPIO_OUT_ENABLE, ORION5X_GPIO_BASE+0x04);
-	writel(ORION5X_GPIO_IN_POLARITY, ORION5X_GPIO_BASE+0x0c);
-
 	/* initialize timer */
 	timer_init_r();
+
+	/* USB workaround */
+#ifdef CONFIG_USB_EHCI_MARVELL
+	orion5x_usb_workaround(MVUSB0_BASE);
+#ifdef MVUSB1_BASE
+	orion5x_usb_workaround(MVUSB1_BASE);
+#endif
+#endif
+
 	return 0;
 }
 #endif /* CONFIG_ARCH_MISC_INIT */

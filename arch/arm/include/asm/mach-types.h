@@ -1100,9 +1100,11 @@ extern unsigned int __machine_arch_type;
 #define MACH_TYPE_THALES_ADC           3492
 #define MACH_TYPE_UBISYS_P9D_EVP       3493
 #define MACH_TYPE_ATDGP318             3494
+#define MACH_TYPE_POGO_E02             3542
 #define MACH_TYPE_OMAP5_SEVM           3777
 #define MACH_TYPE_PICOSAM9G45          3838
 #define MACH_TYPE_ARMADILLO_800EVA     3863
+#define MACH_TYPE_POGOPLUGV4           3960
 #define MACH_TYPE_KZM9G                4140
 #define MACH_TYPE_COLIBRI_T30          4493
 #define MACH_TYPE_APALIS_T30           4513

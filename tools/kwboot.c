@@ -661,7 +661,8 @@ kwboot_img_patch_hdr(void *img, size_t size)
 	 * This way, the execution address is identical to the
 	 * one the image is compiled for (TEXT_BASE).
 	 */
-	hdr->destaddr = hdr->destaddr - sizeof(struct image_header);
+	if (image_check_hcrc(img + hdr->srcaddr))
+		hdr->destaddr = hdr->destaddr - sizeof(struct image_header);
 
 	if (image_ver == 0) {
 		struct main_hdr_v0 *hdr_v0 = img;

@@ -15,6 +15,27 @@
  * Configuration values for SDRAM access setup
  */
 
+#ifdef CONFIG_SYS_DDR2
+
+/* DDR2 200MHz: 2 x 512Mbit x 16 ==> 128MB */
+#define SDRAM_EXT_MODE			0x00000440
+#define SDRAM_ODT_CTRL_LOW		0x00010000
+#define SDRAM_ODT_CTRL_HI		0x00000000
+#define SDRAM_ODT_CTRL			0x00000801
+#define DDR2_PAD_STRENGTH_DEFAULT	0x00003000
+#define FTDLL_DDR2_200MHZ		0x00f95001
+
+#define SDRAM_CONFIG			0x03158618
+#define SDRAM_MODE			0x00000432
+#define SDRAM_CONTROL			0x04041040
+#define SDRAM_TIME_CTRL_LOW		0x11812220
+#define SDRAM_TIME_CTRL_HI		0x0000030f
+#define SDRAM_OPEN_PAGE_EN		0x00000000
+#define SDRAM_BANK0_SIZE		0x07ff0001
+#define SDRAM_ADDR_CTRL			0x00000020
+
+#else
+
 #define SDRAM_CONFIG			0x3148400
 #define SDRAM_MODE			0x62
 #define SDRAM_CONTROL			0x4041000
@@ -25,8 +46,11 @@
 #define SDRAM_BANK0_SIZE		0x3ff0001
 #define SDRAM_ADDR_CTRL			0x10
 
+#endif
+
 #define SDRAM_OP_NOP			0x05
 #define SDRAM_OP_SETMODE		0x03
+#define SDRAM_OP_SETEXTMODE		0x04
 
 #define SDRAM_PAD_CTRL_WR_EN		0x80000000
 #define SDRAM_PAD_CTRL_TUNE_EN		0x00010000
@@ -70,7 +94,7 @@
 
 lowlevel_init:
 
-#ifdef CONFIG_SPL_BUILD
+#if defined(CONFIG_SPL_BUILD) || defined(CONFIG_SYS_ROMBOOT)
 
 	/* Use 'r4 as the base for internal register accesses */
 	ldr	r4, =ORION5X_REGS_PHY_BASE
@@ -166,6 +190,68 @@ lowlevel_init:
 	cmp	r6, #0
 	bne	2b
 
+#ifdef CONFIG_SYS_DDR2
+	/* Config DDR2 registers (Extended mode, ODTs and pad calibration) */
+	ldr	r6, =SDRAM_CONFIG
+	tst	r6, #0x10000
+	beq	3f
+
+	/* 9) Write SDRAM Extended mode register */
+	/* This operation should be done for each memory bank */
+
+	/* write 'nop' to SDRAM operation */
+	ldr	r6, =SDRAM_OP_NOP
+	str	r6, [r3, #0x418]
+
+1:
+	/* Poll SDRAM operation. Make sure it's back to normal operation */
+	ldr	r6, [r3, #0x418]
+	cmp	r6, #0
+	bne	1b
+
+	/* Now it's safe to write new value to SDRAM Extended Mode register */
+	ldr	r6, =SDRAM_EXT_MODE
+	str	r6, [r3, #0x420]
+
+	/* Go over each of the banks */
+	ldr	r1, =0	/* r6 = DRAM bank num */
+
+2:
+	/* Set the SDRAM Operation Control to each of the DRAM banks */
+	mov	r6, r1	/* Do not swap the bank counter value */
+	str	r6, [r3, #0x42c]
+
+	/* Make the Dunit write the DRAM its new mode */
+	ldr	r6, =SDRAM_OP_SETEXTMODE
+	str	r6, [r3, #0x418]
+
+1:
+	/* Poll SDRAM operation. Make sure it's back to normal operation */
+	ldr	r6, [r3, #0x418]
+	cmp	r6, #0
+	bne	1b
+
+	add	r1, r1, #1
+	cmp	r1, #4		/* 4 = Number of banks */
+	bne	2b
+
+	/* Config DDR2 On Die Termination (ODT) registers */
+
+	/* Write SDRAM DDR2 ODT Control Low register */
+	ldr	r6, =SDRAM_ODT_CTRL_LOW
+	str	r6, [r3, #0x494]
+
+	/* Write SDRAM DDR2 ODT Control High register */
+	ldr	r6, =SDRAM_ODT_CTRL_HI
+	str	r6, [r3, #0x498]
+
+	/* Write SDRAM DDR2 ODT Control register */
+	ldr	r6, =SDRAM_ODT_CTRL
+	str	r6, [r3, #0x49c]
+
+3:
+#endif
+
 	/* DDR SDRAM Address/Control Pads Calibration */
 	ldr	r6, [r3, #0x4C0]
 
@@ -214,7 +300,22 @@ lowlevel_init:
 	/* Implement Guideline (GL# MEM-3) Drive Strength Value		*/
 	/* Relevant for: 88F5181-A1/B0/B1 and 88F5281-A0/B0		*/
 
+#ifdef CONFIG_SYS_DDR2
+	ldr	r6, =SDRAM_CONFIG
+	tst	r6, #0x10000
+	beq	1f
+
+	ldr	r1, =DDR2_PAD_STRENGTH_DEFAULT
+	b	2f
+
+1:
+#endif
+
 	ldr	r1, =DDR1_PAD_STRENGTH_DEFAULT
+
+#ifdef CONFIG_SYS_DDR2
+2:
+#endif
 
 	/* Enable writes to DDR SDRAM Addr/Ctrl Pads Calibration register */
 	ldr	r6, [r3, #0x4C0]
@@ -240,6 +341,17 @@ lowlevel_init:
 
 	/* Implement Guideline (GL# MEM-4) DQS Reference Delay Tuning	*/
 	/* Relevant for: 88F5181-A1/B0/B1 and 88F5281-A0/B0		*/
+
+#ifdef CONFIG_SYS_DDR2
+	ldr	r6, =SDRAM_CONFIG
+	tst	r6, #0x10000
+	beq	1f
+
+	ldr	r6, =FTDLL_DDR2_200MHZ
+	b	3f
+
+1:
+#endif
 
 	/* Get the "sample on reset" register for the DDR frequancy	*/
 	ldr	r3, =0x10000
@@ -275,13 +387,15 @@ lowlevel_init:
 	orr	r2, r2, r6
 	str	r2, [r3, #0x484]
 
+#ifndef CONFIG_SYS_ROMBOOT
 	/* enable for 2 GB DDR; detection should find out real amount */
 	sub	r6, r6, r6
 	str	r6, [r3, #0x500]
 	ldr	r6, =0x7fff0001
 	str	r6, [r3, #0x504]
+#endif
 
-#endif /* CONFIG_SPL_BUILD */
+#endif /* CONFIG_SPL_BUILD || CONFIG_SYS_ROMBOOT */
 
 	/* Return to U-Boot via saved link register */
 	mov	pc, lr

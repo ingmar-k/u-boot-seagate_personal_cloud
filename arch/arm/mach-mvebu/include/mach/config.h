@@ -24,6 +24,8 @@
  * for A38x as well here.
  */
 #define MV88F78X60 /* for the DDR training bin_hdr code */
+#elif defined(CONFIG_ARMADA_370)
+#define MV88F67XX /* for the DDR training bin_hdr code */
 #endif
 
 #define CONFIG_SYS_CACHELINE_SIZE	32
@@ -102,6 +104,10 @@
 /* Use common timer */
 #define CONFIG_SYS_TIMER_COUNTS_DOWN
 #define CONFIG_SYS_TIMER_COUNTER	(MVEBU_TIMER_BASE + 0x14)
+#if defined(CONFIG_ARMADA_370)
+#define CONFIG_SYS_TIMER_RATE		CONFIG_SYS_L2CLK
+#else
 #define CONFIG_SYS_TIMER_RATE		25000000
+#endif
 
 #endif /* __MVEBU_CONFIG_H */

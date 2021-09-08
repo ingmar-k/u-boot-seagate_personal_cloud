@@ -26,3 +26,5 @@ CFLAGS_cpu.o := -marm
 
 endif
 endif
+
+obj-$(CONFIG_USB_EHCI_MARVELL)	+= usb.o

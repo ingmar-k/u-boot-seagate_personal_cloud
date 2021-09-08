@@ -123,7 +123,11 @@ U_BOOT_DRIVER(ehci_mvebu) = {
 };
 
 #else
+#ifdef MVUSB1_BASE
+#define MVUSB_BASE(port)	((port) ? MVUSB1_BASE : MVUSB0_BASE)
+#else
 #define MVUSB_BASE(port)	MVUSB0_BASE
+#endif
 
 static void usb_brg_adrdec_setup(int index)
 {
@@ -157,12 +161,12 @@ static void usb_brg_adrdec_setup(int index)
 		if ((size) && (attrib))
 			writel(MVCPU_WIN_CTRL_DATA(size, USB_TARGET_DRAM,
 						   attrib, MVCPU_WIN_ENABLE),
-				MVUSB0_BASE + USB_WINDOW_CTRL(i));
+				MVUSB_BASE(index) + USB_WINDOW_CTRL(i));
 		else
 			writel(MVCPU_WIN_DISABLE,
-			       MVUSB0_BASE + USB_WINDOW_CTRL(i));
+			       MVUSB_BASE(index) + USB_WINDOW_CTRL(i));
 
-		writel(base, MVUSB0_BASE + USB_WINDOW_BASE(i));
+		writel(base, MVUSB_BASE(index) + USB_WINDOW_BASE(i));
 	}
 }
 

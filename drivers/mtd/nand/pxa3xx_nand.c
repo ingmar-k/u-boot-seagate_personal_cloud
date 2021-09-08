@@ -217,6 +217,10 @@ static struct pxa3xx_nand_timing timing[] = {
 	{ 10,  0, 20,  40, 30,  40, 11123, 110, 10, },
 	{ 10, 25, 15,  25, 15,  30, 25000,  60, 10, },
 	{ 10, 35, 15,  25, 15,  25, 25000,  60, 10, },
+	/* Hynix H27U4G8F2D 4Gbit(512M x 8bit) 3.0V(ID: 0xDCAD) */
+	{  5, 20, 10,  12, 10,  12, 25000,  60, 10, },
+	/* Toshiba TC58NVG2S3ETAI0 4Gbit(512M x 8bit) 3.3V(ID: 0xDC98) */
+	{  5, 20, 10,  12, 10,  12, 30000,  60, 10, },
 };
 
 static struct pxa3xx_nand_flash builtin_flash_types[] = {
@@ -228,8 +232,13 @@ static struct pxa3xx_nand_flash builtin_flash_types[] = {
 	{ 0xdc2c,  8,  8, &timing[2] },
 	{ 0xcc2c, 16, 16, &timing[2] },
 	{ 0xba20, 16, 16, &timing[3] },
+	/* Hynix H27U4G8F2D 4Gbit(512M x 8bit) 3.0V(ID: 0xDCAD) */
+	{ 0xdcad,  8,  8, &timing[4] },
+	/* Toshiba TC58NVG2S3ETAI0 4Gbit(512M x 8bit) 3.3V(ID: 0xDC98) */
+	{ 0xdc98,  8,  8, &timing[5] },
 };
 
+#ifdef CONFIG_SYS_NAND_USE_FLASH_BBT
 static u8 bbt_pattern[] = {'M', 'V', 'B', 'b', 't', '0' };
 static u8 bbt_mirror_pattern[] = {'1', 't', 'b', 'B', 'V', 'M' };
 
@@ -252,6 +261,7 @@ static struct nand_bbt_descr bbt_mirror_descr = {
 	.maxblocks = 8,		/* Last 8 blocks in each chip */
 	.pattern = bbt_mirror_pattern
 };
+#endif
 
 static struct nand_ecclayout ecc_layout_2KB_bch4bit = {
 	.eccbytes = 32,
@@ -300,7 +310,7 @@ static struct nand_ecclayout ecc_layout_4KB_bch8bit = {
 #define NDTR1_tAR(c)	(min((c), 15) << 0)
 
 /* convert nano-seconds to nand flash controller clock cycles */
-#define ns2cycle(ns, clk)	(int)((ns) * (clk / 1000000) / 1000)
+#define ns2cycle(ns, clk)	(int)DIV_ROUND_UP((ns) * (clk / 1000000), 1000)
 
 static enum pxa3xx_nand_variant pxa3xx_nand_get_variant(void)
 {
@@ -460,8 +470,8 @@ static void pxa3xx_nand_start(struct pxa3xx_nand_info *info)
 			nand_writel(info, NDECCCTRL, 0x1);
 	} else {
 		ndcr &= ~NDCR_ECC_EN;
-		if (info->ecc_bch)
-			nand_writel(info, NDECCCTRL, 0x0);
+		/* Must be cleared for Read ID command */
+		nand_writel(info, NDECCCTRL, 0x0);
 	}
 
 	ndcr &= ~NDCR_DMA_EN;
@@ -1216,6 +1226,10 @@ static int pxa3xx_nand_config_flash(struct pxa3xx_nand_info *info)
 	info->reg_ndcr |= (chip->page_shift == 6) ? NDCR_PG_PER_BLK : 0;
 	info->reg_ndcr |= (mtd->writesize == 2048) ? NDCR_PAGE_SZ : 0;
 
+#ifdef CONFIG_SYS_NAND_KEEP_CONFIG
+	nand_writel(info, NDCR, info->reg_ndcr);
+#endif
+
 	return 0;
 }
 
@@ -1532,6 +1546,14 @@ static int pxa3xx_nand_probe_dt(struct pxa3xx_nand_info *info)
 
 	pdata->enable_arbiter = 1;
 	pdata->num_cs = 1;
+
+#ifdef CONFIG_SYS_NAND_ECC_STRENGTH
+	pdata->ecc_strength = CONFIG_SYS_NAND_ECC_STRENGTH;
+#endif
+
+#ifdef CONFIG_SYS_NAND_ECC_STEP_SIZE
+	pdata->ecc_step_size = CONFIG_SYS_NAND_ECC_STEP_SIZE;
+#endif
 
 	info->pdata = pdata;
 

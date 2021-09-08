@@ -1,0 +1,10 @@
+LSGL BOARD
+M:	Steve Shih <shihsung@gmail.com>
+S:	Maintained
+F:	board/buffalo/lsgl/
+F:	include/configs/lsgl.h
+F:	configs/kuropro_defconfig
+F:	configs/kuropro_nand_defconfig
+F:	configs/kuropro_ram_defconfig
+F:	configs/lsgl_defconfig
+F:	configs/lsgl_ram_defconfig

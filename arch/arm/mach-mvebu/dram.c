@@ -12,7 +12,7 @@
 #include <asm/arch/cpu.h>
 #include <asm/arch/soc.h>
 
-#if defined(CONFIG_ARCH_MVEBU)
+#if defined(CONFIG_ARCH_MVEBU) && !defined(CONFIG_ARMADA_370)
 /* Use common XOR definitions for A3x and AXP */
 #include "../../../drivers/ddr/marvell/axp/xor.h"
 #include "../../../drivers/ddr/marvell/axp/xor_regs.h"
@@ -109,7 +109,7 @@ void mvebu_sdram_size_adjust(enum memory_bank bank)
 	mvebu_sdram_bs_set(bank, size);
 }
 
-#if defined(CONFIG_ARCH_MVEBU)
+#if defined(CONFIG_ARCH_MVEBU) && !defined(CONFIG_ARMADA_370)
 static u32 xor_ctrl_save;
 static u32 xor_base_save;
 static u32 xor_mask_save;

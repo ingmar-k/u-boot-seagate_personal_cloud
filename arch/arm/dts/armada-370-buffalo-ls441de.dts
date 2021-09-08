@@ -1,0 +1,453 @@
+/*
+ * Device Tree file for Buffalo LS441DE
+ *
+ * Copyright (C) 2014, 2016
+ * Steve Shih <shihsung@gmail.com>
+ *
+ * This file is licensed under the terms of the GNU General Public
+ * License version 2.  This program is licensed "as is" without any
+ * warranty of any kind, whether express or implied.
+ */
+
+/dts-v1/;
+
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/gpio/gpio.h>
+#include "armada-370.dtsi"
+
+/ {
+	model = "Buffalo LS441DE";
+	compatible = "buffalo,ls400",
+		     "marvell,armada370", "marvell,armada-370-xp";
+
+	aliases {
+		spi0 = &spi0;
+	};
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
+
+	memory {
+		device_type = "memory";
+		reg = <0x00000000 0x20000000>; /* 512 MB */
+	};
+
+	soc {
+		ranges = <MBUS_ID(0xf0, 0x01) 0 0xf1000000 0x100000
+			  MBUS_ID(0x01, 0xe0) 0 0xfff00000 0x100000>;
+		u-boot,dm-pre-reloc;
+
+		internal-regs {
+			spi@10600 {
+				status = "okay";
+				pinctrl-0 = <&spi0_pins2>;
+				pinctrl-names = "default";
+				u-boot,dm-pre-reloc;
+
+				spi-flash@0 {
+					#address-cells = <1>;
+					#size-cells = <1>;
+					compatible = "jedec,spi-nor";
+					reg = <0>;
+					spi-max-frequency = <80000000>;
+					mode = <3>;
+
+					partition@0 {
+						reg = <0x0 0xf0000>;
+						label = "U-Boot";
+					};
+
+					partition@f0000 {
+						reg = <0xf0000 0x10000>;
+						label = "ENV";
+					};
+				};
+			};
+
+			i2c@11000 {
+				clock-frequency = <100000>;
+				status = "okay";
+
+				rs5c372a: rs5c372a@32 {
+					compatible = "ricoh,rs5c372a";
+					reg = <0x32>;
+				};
+			};
+
+			serial@12000 {
+				status = "okay";
+				u-boot,dm-pre-reloc;
+			};
+
+			usb@50000 {
+				status = "okay";
+			};
+
+			mdio {
+				/* Marvell 88E1518 */
+				phy0: ethernet-phy@0 {
+					reg = <0>;
+					marvell,reg-init = <0x3 0x10
+							    0xf000 0x081e>,
+							   <0x3 0x11
+							    0xfff0 0x0001>;
+				};
+			};
+
+			ethernet@74000 {
+				status = "okay";
+				phy = <&phy0>;
+				phy-mode = "rgmii-id";
+			};
+
+			nand@d0000 {
+				status = "okay";
+				num-cs = <1>;
+				marvell,nand-keep-config;
+				marvell,nand-enable-arbiter;
+				nand-on-flash-bbt;
+				nand-ecc-strength = <4>;
+				nand-ecc-step-size = <512>;
+
+				partition@0 {
+					label = "UBIFS";
+					reg = <0x0 0x20000000>;
+				};
+			};
+		};
+
+		pcie-controller {
+			status = "okay";
+
+			/* Connected to NEC D720202 USB 3.0 xHCI controller */
+			pcie@1,0 {
+				/* Port 0, Lane 0 */
+				status = "okay";
+			};
+
+			/* Connected to Marvell 88SE9215 AHCI controller */
+			pcie@2,0 {
+				/* Port 1, Lane 0 */
+				status = "okay";
+			};
+		};
+	};
+
+	gpio_fan {
+		compatible = "gpio-fan";
+		pinctrl-0 = <&fan_lock
+			     &fan_low
+			     &fan_high>;
+		pinctrl-names = "default";
+		gpios = <&gpio0 13 GPIO_ACTIVE_LOW
+			 &gpio0 14 GPIO_ACTIVE_LOW>;
+		gpio-fan,speed-map = <   0 3
+				      1200 2
+				      1800 1
+				      2050 0>;
+		alarm-gpios = <&gpio0 12 GPIO_ACTIVE_HIGH>;
+	};
+
+	gpio-keys {
+		compatible = "gpio-keys";
+		pinctrl-0 = <&usb_oc_n
+			     &hdd_hot0_n
+			     &hdd_hot1_n
+			     &power_sw_n
+			     &func_sw_n
+			     &hdd_hot2_n
+			     &hdd_hot3_n>;
+		pinctrl-names = "default";
+
+		usb-oc {
+			label = "USB Over Current Fault";
+			linux,code = <KEY_EXIT>;
+			gpios = <&gpio0 6 GPIO_ACTIVE_LOW>;
+		};
+
+		hdd0-hot {
+			label = "Hard Disk 1 Present";
+			linux,code = <KEY_PROG1>;
+			gpios = <&gpio0 10 GPIO_ACTIVE_LOW>;
+		};
+
+		hdd1-hot {
+			label = "Hard Disk 2 Present";
+			linux,code = <KEY_PROG2>;
+			gpios = <&gpio0 11 GPIO_ACTIVE_LOW>;
+		};
+
+		power-switch {
+			label = "Power Switch";
+			linux,code = <KEY_POWER>;
+			gpios = <&gpio0 15 GPIO_ACTIVE_LOW>;
+			debounce-interval = <3000>;
+		};
+
+		func-button {
+			label = "Function Button";
+			linux,code = <KEY_EJECTCD>;
+			gpios = <&gpio0 16 GPIO_ACTIVE_LOW>;
+			debounce-interval = <3000>;
+		};
+
+		hdd2-hot {
+			label = "Hard Disk 3 Present";
+			linux,code = <KEY_PROG3>;
+			gpios = <&gpio1 18 GPIO_ACTIVE_LOW>;
+		};
+
+		hdd3-hot {
+			label = "Hard Disk 4 Present";
+			linux,code = <KEY_PROG4>;
+			gpios = <&gpio1 19 GPIO_ACTIVE_LOW>;
+		};
+	};
+
+	gpio-leds {
+		compatible = "gpio-leds";
+		pinctrl-0 = <&power_led
+			     &hdd_pwr1
+			     &hdd_pwr0
+			     &func_red
+			     &hdd3_err_led
+			     &hdd_pwr3
+			     &hdd_pwr2
+			     &info_led
+			     &hdd2_err_led
+			     &func_led
+			     &err_led
+			     &hdd0_err_led
+			     &hdd1_err_led>;
+		pinctrl-names = "default";
+
+		power-led {
+			label = "ls440:white:power";
+			gpios = <&gpio0 5 GPIO_ACTIVE_HIGH>;
+			default-state = "on";
+		};
+
+		hd1-power {
+			label = "PowerHD2";
+			gpios = <&gpio0 7 GPIO_ACTIVE_HIGH>;
+			default-state = "keep";
+		};
+
+		hd0-power {
+			label = "PowerHD1";
+			gpios = <&gpio0 8 GPIO_ACTIVE_HIGH>;
+			default-state = "keep";
+		};
+
+		func-red {
+			label = "ls440:red:function";
+			gpios = <&gpio0 9 GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+		};
+
+		hdd3-err-led {
+			label = "ls440:red:hdd3";
+			gpios = <&gpio1 15 GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+		};
+
+		hd3-power {
+			label = "PowerHD4";
+			gpios = <&gpio1 16 GPIO_ACTIVE_HIGH>;
+			default-state = "keep";
+		};
+
+		hd2-power {
+			label = "PowerHD3";
+			gpios = <&gpio1 20 GPIO_ACTIVE_HIGH>;
+			default-state = "keep";
+		};
+
+		info-led {
+			label = "ls440:orange:power";
+			gpios = <&gpio1 22 GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+		};
+
+		hdd2-err-led {
+			label = "ls440:red:hdd2";
+			gpios = <&gpio1 26 GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+		};
+
+		func-led {
+			label = "ls440:white:function";
+			gpios = <&gpio1 27 GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+		};
+
+		err-led {
+			label = "ls440:red:power";
+			gpios = <&gpio1 28 GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+		};
+
+		hdd0-err-led {
+			label = "ls440:red:hdd0";
+			gpios = <&gpio1 29 GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+		};
+
+		hdd1-err-led {
+			label = "ls440:red:hdd1";
+			gpios = <&gpio1 30 GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+		};
+	};
+
+	restart_poweroff {
+		compatible = "restart-poweroff";
+	};
+};
+
+&pinctrl {
+	/* out: default 1 */
+	power_led: power-led {
+		marvell,pins = "mpp5";
+		marvell,function = "gpo";
+	};
+
+	/* ??? in */
+	usb_oc_n: usb-oc-n {
+		marvell,pins = "mpp6";
+		marvell,function = "gpio";
+	};
+
+	/* out: default 0 */
+	hdd_pwr1: hdd-pwr1 {
+		marvell,pins = "mpp7";
+		marvell,function = "gpo";
+	};
+
+	/* out: default 0 */
+	hdd_pwr0: hdd-pwr0 {
+		marvell,pins = "mpp8";
+		marvell,function = "gpio";
+	};
+
+	/* out: default 0 */
+	func_red: func-red {
+		marvell,pins = "mpp9";
+		marvell,function = "gpo";
+	};
+
+	/* in */
+	hdd_hot0_n: hdd-hot0-n {
+		marvell,pins = "mpp10";
+		marvell,function = "gpio";
+	};
+
+	/* in */
+	hdd_hot1_n: hdd-hot1-n {
+		marvell,pins = "mpp11";
+		marvell,function = "gpio";
+	};
+
+	/* ??? in */
+	fan_lock: fan-lock {
+		marvell,pins = "mpp12";
+		marvell,function = "gpio";
+	};
+
+	/* out: default 0 */
+	fan_high: fan-high {
+		marvell,pins = "mpp13";
+		marvell,function = "gpio";
+	};
+
+	/* out: default 0 */
+	fan_low: fan-low {
+		marvell,pins = "mpp14";
+		marvell,function = "gpio";
+	};
+
+	/* in */
+	power_sw_n: power-sw-n {
+		marvell,pins = "mpp15";
+		marvell,function = "gpio";
+	};
+
+	/* in */
+	func_sw_n: func-sw-n {
+		marvell,pins = "mpp16";
+		marvell,function = "gpio";
+	};
+
+	/* ??? in */
+	uart_en_n: uart-en-n {
+		marvell,pins = "mpp31";
+		marvell,function = "gpio";
+	};
+
+	/* out: default 0 */
+	hdd3_err_led: hdd3-err-led {
+		marvell,pins = "mpp47";
+		marvell,function = "gpo";
+	};
+
+	/* out: default 0 */
+	hdd_pwr3: hdd-pwr3 {
+		marvell,pins = "mpp49";
+		marvell,function = "gpio";
+	};
+
+	/* in */
+	hdd_hot2_n: hdd-hot2-n {
+		marvell,pins = "mpp50";
+		marvell,function = "gpio";
+	};
+
+	/* in */
+	hdd_hot3_n: hdd-hot3-n {
+		marvell,pins = "mpp51";
+		marvell,function = "gpio";
+	};
+
+	/* out: default 0 */
+	hdd_pwr2: hdd-pwr2 {
+		marvell,pins = "mpp52";
+		marvell,function = "gpio";
+	};
+
+	/* out: default 0 */
+	info_led: info-led {
+		marvell,pins = "mpp54";
+		marvell,function = "gpo";
+	};
+
+	/* out: default 0 */
+	hdd2_err_led: hdd2-err-led {
+		marvell,pins = "mpp58";
+		marvell,function = "gpio";
+	};
+
+	/* out: default 0 */
+	func_led: func-led {
+		marvell,pins = "mpp59";
+		marvell,function = "gpo";
+	};
+
+	/* out: default 0 */
+	err_led: err-led {
+		marvell,pins = "mpp60";
+		marvell,function = "gpio";
+	};
+
+	/* out: default 0 */
+	hdd0_err_led: hdd0-err-led {
+		marvell,pins = "mpp61";
+		marvell,function = "gpo";
+	};
+
+	/* out: default 0 */
+	hdd1_err_led: hdd1-err-led {
+		marvell,pins = "mpp62";
+		marvell,function = "gpio";
+	};
+};

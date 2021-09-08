@@ -25,6 +25,7 @@ obj-y	+= timer.o
 obj-$(CONFIG_SPL_BUILD) += spl.o
 obj-$(CONFIG_SPL_BUILD) += lowlevel_spl.o
 
+obj-$(CONFIG_ARMADA_370) += serdes/a370/
 obj-$(CONFIG_ARMADA_38X) += serdes/a38x/
 obj-$(CONFIG_ARMADA_XP) += serdes/axp/
 

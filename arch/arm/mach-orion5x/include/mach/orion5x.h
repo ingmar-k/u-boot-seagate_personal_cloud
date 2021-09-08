@@ -43,7 +43,12 @@
 #define MVGBE0_BASE	ORION5X_EGIGA_BASE
 
 /* Orion5x USB Host controller is port 1 */
-#define MVUSB0_BASE			ORION5X_USB20_HOST_PORT_BASE
+#ifndef MVUSB0_BASE
+#define MVUSB0_BASE			ORION5X_USB20_PORT0_BASE
+#endif
+#ifndef MVUSB1_BASE
+#define MVUSB1_BASE			ORION5X_USB20_PORT1_BASE
+#endif
 #define MVUSB0_CPU_ATTR_DRAM_CS0	ORION5X_ATTR_DRAM_CS0
 #define MVUSB0_CPU_ATTR_DRAM_CS1	ORION5X_ATTR_DRAM_CS1
 #define MVUSB0_CPU_ATTR_DRAM_CS2	ORION5X_ATTR_DRAM_CS2
@@ -54,7 +59,9 @@
 #define MVCPU_WIN_ENABLE	ORION5X_WIN_ENABLE
 #define MVCPU_WIN_DISABLE	ORION5X_WIN_DISABLE
 
+#ifndef CONFIG_MAX_RAM_BANK_SIZE
 #define CONFIG_MAX_RAM_BANK_SIZE		(64*1024*1024)
+#endif
 
 /* include here SoC variants. 5181, 5281, 6183 should go here when
    adding support for them, and this comment should then be updated. */
